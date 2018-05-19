@@ -22,6 +22,7 @@ class ApiCalendar {
      * @param {boolean} isSignedIn
      */
     updateSigninStatus(isSignedIn) {
+        console.log('update sign in status:' + isSignedIn);
         this.sign = isSignedIn;
     }
     /**
@@ -107,19 +108,17 @@ class ApiCalendar {
     }
     /**
      * List all events in the calendar
-     * @param {number} maxResults to see
+     * @param {Date} timeMin the start timestamp to list events for
+     * @param {Date} timeMax the end timestamp to list events for
      * @param {string} calendarId to see by default use the calendar attribute
      * @returns {any}
      */
-    listUpcomingEvents(maxResults, calendarId = this.calendar) {
+    listUpcomingEvents(timeMin, timeMax, calendarId = this.calendar) {
         if (this.gapi) {
             return this.gapi.client.calendar.events.list({
                 'calendarId': calendarId,
-                'timeMin': (new Date()).toISOString(),
-                'showDeleted': false,
-                'singleEvents': true,
-                'maxResults': maxResults,
-                'orderBy': 'startTime'
+                'timeMin': timeMin.toISOString(),
+                'timeMax': timeMax.toISOString()
             });
         }
         else {
@@ -127,6 +126,7 @@ class ApiCalendar {
             return false;
         }
     }
+
     /**
      * Create an event from the current time for a certain period
      * @param {number} time in minutes for the event
