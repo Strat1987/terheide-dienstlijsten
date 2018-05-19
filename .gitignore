@@ -9,6 +9,9 @@
 # production
 /build
 
+# Credentials
+/src/lib/apiGoogleconfig.json
+
 # misc
 .DS_Store
 .env.local
