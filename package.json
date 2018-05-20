@@ -6,7 +6,6 @@
   "dependencies": {
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
-    "react-google-calendar-api": "git+https://github.com/Strat1987/react-google-calendar-api.git#es5TargetCompilerOption",
     "react-scripts": "1.1.4"
   },
   "scripts": {

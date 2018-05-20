@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import logo from './terheide.png';
 import './App.css';
-import ApiCalendar from './lib/ApiCalendar.js';
+import ApiCalendar from './lib/ApiCalendar';
+import CalendarItem from './components/CalendarItem'
 
 class App extends Component {
 
@@ -10,7 +11,9 @@ class App extends Component {
     this.state = {
       sign: ApiCalendar.sign,
       calendarId: "<CALENDAR_ID>",
-      monthRange: this.currentMonthDateRange()
+      monthRange: this.currentMonthDateRange(),
+      //test events since API can't connect on localhost
+      calendarEvents: [{ "kind": "calendar#event", "etag": "\"3045134953452000\"", "id": "618s8bn3f7oufmrbblkpnhslc8", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=NjE4czhibjNmN291Zm1yYmJsa3BuaHNsYzggMG8ydDRoa2R1b3Q2N2ZidDY0aWx0ZnJwZWdAZw", "created": "2018-04-01T07:24:36.000Z", "updated": "2018-04-01T07:24:36.726Z", "summary": "B-45 (late)", "creator": { "email": "roexbert@gmail.com", "displayName": "Bert Roex" }, "organizer": { "email": "0o2t4hkduot67fbt64iltfrpeg@group.calendar.google.com", "displayName": "Ter Heide", "self": true }, "start": { "dateTime": "2018-05-01T13:15:00+02:00" }, "end": { "dateTime": "2018-05-01T21:00:00+02:00" }, "iCalUID": "618s8bn3f7oufmrbblkpnhslc8@google.com", "sequence": 0, "reminders": { "useDefault": true } }, { "kind": "calendar#event", "etag": "\"3045134965146000\"", "id": "gua9gpc9b8i4kvb9e37stp42d8", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=Z3VhOWdwYzliOGk0a3ZiOWUzN3N0cDQyZDggMG8ydDRoa2R1b3Q2N2ZidDY0aWx0ZnJwZWdAZw", "created": "2018-04-01T07:24:42.000Z", "updated": "2018-04-01T07:24:42.573Z", "summary": "A (vroege)", "creator": { "email": "roexbert@gmail.com", "displayName": "Bert Roex" }, "organizer": { "email": "0o2t4hkduot67fbt64iltfrpeg@group.calendar.google.com", "displayName": "Ter Heide", "self": true }, "start": { "dateTime": "2018-05-03T06:30:00+02:00" }, "end": { "dateTime": "2018-05-03T15:00:00+02:00" }, "iCalUID": "gua9gpc9b8i4kvb9e37stp42d8@google.com", "sequence": 0, "reminders": { "useDefault": true } }]
     };
     this.signUpdate = this.signUpdate.bind(this);
     this.currentMonthDateRange = this.currentMonthDateRange.bind(this);
@@ -41,9 +44,11 @@ class App extends Component {
   getEvents() {
     console.log('monthRange: ' + JSON.stringify(this.state.monthRange));
     ApiCalendar.listUpcomingEvents(this.state.monthRange.from, this.state.monthRange.to)
-    .then(({result}) => {
-      console.log(result.items);
-    });
+      .then(({ result }) => {
+        const events = result.items;
+        console.log(events);
+        this.setState({ calendarEvents: events });
+      })
   }
 
   signUpdate(signResult) {
@@ -108,6 +113,11 @@ class App extends Component {
         {this.state.sign ?
           <button onClick={(e) => this.handleGoogleAuth(e, "logout")}>Uitloggen</button> :
           <button onClick={(e) => this.handleGoogleAuth(e, "login")}>Inloggen</button>}
+        <div>
+          {this.state.calendarEvents.map((event) =>
+            <CalendarItem event={event} />
+          )}
+        </div>
       </div>
     );
   }
