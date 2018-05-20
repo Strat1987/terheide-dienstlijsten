@@ -3,6 +3,7 @@ import logo from './terheide.png';
 import './App.css';
 import ApiCalendar from './lib/ApiCalendar';
 import CalendarItem from './components/CalendarItem'
+import Month from './components/Month'
 
 class App extends Component {
 
@@ -12,9 +13,11 @@ class App extends Component {
       sign: ApiCalendar.sign,
       calendarId: "<CALENDAR_ID>",
       monthRange: this.currentMonthDateRange(),
+      currentMonth: "",
       //test events since API can't connect on localhost
       calendarEvents: [{ "kind": "calendar#event", "etag": "\"3045134953452000\"", "id": "618s8bn3f7oufmrbblkpnhslc8", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=NjE4czhibjNmN291Zm1yYmJsa3BuaHNsYzggMG8ydDRoa2R1b3Q2N2ZidDY0aWx0ZnJwZWdAZw", "created": "2018-04-01T07:24:36.000Z", "updated": "2018-04-01T07:24:36.726Z", "summary": "B-45 (late)", "creator": { "email": "roexbert@gmail.com", "displayName": "Bert Roex" }, "organizer": { "email": "0o2t4hkduot67fbt64iltfrpeg@group.calendar.google.com", "displayName": "Ter Heide", "self": true }, "start": { "dateTime": "2018-05-01T13:15:00+02:00" }, "end": { "dateTime": "2018-05-01T21:00:00+02:00" }, "iCalUID": "618s8bn3f7oufmrbblkpnhslc8@google.com", "sequence": 0, "reminders": { "useDefault": true } }, { "kind": "calendar#event", "etag": "\"3045134965146000\"", "id": "gua9gpc9b8i4kvb9e37stp42d8", "status": "confirmed", "htmlLink": "https://www.google.com/calendar/event?eid=Z3VhOWdwYzliOGk0a3ZiOWUzN3N0cDQyZDggMG8ydDRoa2R1b3Q2N2ZidDY0aWx0ZnJwZWdAZw", "created": "2018-04-01T07:24:42.000Z", "updated": "2018-04-01T07:24:42.573Z", "summary": "A (vroege)", "creator": { "email": "roexbert@gmail.com", "displayName": "Bert Roex" }, "organizer": { "email": "0o2t4hkduot67fbt64iltfrpeg@group.calendar.google.com", "displayName": "Ter Heide", "self": true }, "start": { "dateTime": "2018-05-03T06:30:00+02:00" }, "end": { "dateTime": "2018-05-03T15:00:00+02:00" }, "iCalUID": "gua9gpc9b8i4kvb9e37stp42d8@google.com", "sequence": 0, "reminders": { "useDefault": true } }]
     };
+
     this.signUpdate = this.signUpdate.bind(this);
     this.currentMonthDateRange = this.currentMonthDateRange.bind(this);
     ApiCalendar.onLoad(() => {
@@ -67,37 +70,31 @@ class App extends Component {
 
   currentMonthDateRange() {
     // Set the start-min parameter to the beginning of today.
-    var manipulateDate = new Date();
-    var selectedYear;
-    var selectedMonth;
+    const manipulateDate = new Date();
 
     manipulateDate.setDate(1);
-    if (selectedYear == undefined) {
-      selectedYear = manipulateDate.getFullYear();
-    } else {
-      manipulateDate.setFullYear(selectedYear);
-    }
+    const selectedYear = manipulateDate.getFullYear();
 
-    if (selectedMonth == undefined) {
-      selectedMonth = manipulateDate.getMonth();
-    } else {
-      manipulateDate.setMonth(selectedMonth);
-    }
+    const selectedMonth = manipulateDate.getMonth();
+
+    const locale = "nl-be";
+    const fullMonth = manipulateDate.toLocaleString(locale, { month: "long" });
+
     manipulateDate.setHours(0);
     manipulateDate.setMinutes(0);
     manipulateDate.setSeconds(0);
     manipulateDate.setMilliseconds(0);
-    var firstDayOfMonthWeekDay = manipulateDate.getDay();
-    var fromDate = new Date(manipulateDate);
+    const firstDayOfMonthWeekDay = manipulateDate.getDay();
+    const fromDate = new Date(manipulateDate);
 
     // Set the start-max parameter to the beginning of next month.
     manipulateDate.setDate(this.daysInMonth(manipulateDate.getMonth(), manipulateDate.getFullYear()));
     manipulateDate.setHours(23);
     manipulateDate.setMinutes(59);
     manipulateDate.setSeconds(59);
-    var lastDayOfMonth = manipulateDate.getDate();
-    var toDate = new Date(manipulateDate);
-    return { from: fromDate, to: toDate };
+    const lastDayOfMonth = manipulateDate.getDate();
+    const toDate = new Date(manipulateDate);
+    return { from: fromDate, to: toDate, year: selectedYear, month: selectedMonth, fullMonth: fullMonth, firstDayOfMonthWeekDay: firstDayOfMonthWeekDay, lastDayOfMonth: lastDayOfMonth };
   }
 
   render() {
@@ -105,10 +102,9 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Terheide Dienstlijsten - Google Calendar</h1>
+          <Month currentMonth={this.state.monthRange.fullMonth} currentYear={this.state.monthRange.year} />
         </header>
         <p className="App-intro">
-          Hier kan je je dienstlijsten ingeven zodat deze tevoorschijn komen in Google Calendar.
         </p>
         {this.state.sign ?
           <button onClick={(e) => this.handleGoogleAuth(e, "logout")}>Uitloggen</button> :
